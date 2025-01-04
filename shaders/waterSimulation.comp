@@ -1,0 +1,52 @@
+#version 460 core 
+
+/* Work group size is 32 * 32 = 1024. This value is set because  
+ * GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS must be at least 1024 
+ * according to OpenGL's specification
+ */
+#define localSize 32
+
+layout(local_size_x = localSize, local_size_y = localSize, local_size_z = 1) in;
+
+layout(std430) buffer;
+layout(binding = 0) buffer b_prev { vec4 prev[]; };
+layout(binding = 1) buffer b_curr { vec4 curr[]; };
+layout(binding = 2) buffer b_damping { float damping[]; };
+
+uniform int N;
+uniform float dt;
+uniform float c;
+uniform float h;
+
+//layout(std140, binding = 2) uniform 
+
+uniform int i_disturb[2];
+uniform int j_disturb[2];
+uniform float disturbHeight[2];
+
+void main()
+{   
+    int i = int(gl_GlobalInvocationID.x);
+    int j = int(gl_GlobalInvocationID.y);  
+    
+    if (i >= N || j >= N) {
+        return;
+    }     
+
+    int BI = i * N + j; 
+
+    float A = (c * c * dt * dt) / (h * h);
+    float B = 2 - 4 * A;
+    float d = damping[BI];
+
+    float y1 = i + 1 < N ? curr[(i+1)*N+j].y : 0.0f;
+    float y2 = i - 1 >=0 ? curr[(i-1)*N+j].y : 0.0f;
+    float y3 = j + 1 < N ? curr[i*N+(j+1)].y : 0.0f;
+    float y4 = j - 1 >=0 ? curr[i*N+(j-1)].y : 0.0f;
+
+    float newY = d * (A * (y1 + y2 + y3 + y4) + B * curr[BI].y - prev[BI].y);
+    prev[BI].y = 
+        (i == i_disturb[0] && j == j_disturb[0]) ? disturbHeight[0] : 
+        (i == i_disturb[1] && j == j_disturb[1]) ? disturbHeight[1] : 
+        newY; 
+}

@@ -1,0 +1,48 @@
+#version 460 core
+
+/* Work group size is 32 * 32 = 1024. This value is set because  
+ * GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS must be at least 1024 
+ * according to OpenGL's specification
+ */
+#define localSize 32
+
+layout(local_size_x = localSize, local_size_y = localSize, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer b_prev { vec4 prev[]; };
+layout(rgba32f, binding = 0) uniform image2D normalTex;
+
+uniform int N;
+uniform float h;
+uniform float a;
+
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
+    int i = int(gl_GlobalInvocationID.x);
+    int j = int(gl_GlobalInvocationID.y);
+    
+    if (i >= N || j >= N) {
+        return;
+    }  
+
+    vec3 p = prev[(i+1)*N+j].xyz;
+    vec3 p1 = i + 1 < N ? prev[(i+1)*N+j].xyz : vec3(a/2.0f + h, 0.0f, p.z);
+    vec3 p2 = i - 1 >=0 ? prev[(i-1)*N+j].xyz : vec3(-a/2.0f - h, 0.0f, p.z);
+    vec3 p3 = j + 1 < N ? prev[i*N+(j+1)].xyz : vec3(p.x, 0.0f, a/2.0f + h);
+    vec3 p4 = j - 1 >=0 ? prev[i*N+(j-1)].xyz : vec3(p.x, 0.0f, -a/2.0f - h);
+
+    // d1 and d2 lies on plane perpendicular to Z axis
+    vec3 d1 = p1 - p;   // z == 0.0f;
+    vec3 d2 = p2 - p;   // z == 0.0f;
+    // d3 and d4 lies on plane perpendicular to X axis
+    vec3 d3 = p3 - p;   // x == 0.0f;
+    vec3 d4 = p4 - p;   // x == 0.0f;
+
+    vec3 n1 = vec3(-d1.y, d1.x, 0.0f); // CCW
+    vec3 n2 = vec3(d2.y, -d2.x, 0.0f); // CW
+    vec3 n3 = vec3(0.0f, d3.z, -d3.y); // CCW
+    vec3 n4 = vec3(0.0f, -d4.z, d4.y); // CW
+
+    vec3 n = normalize(n1 + n2 + n3 + n4);
+    imageStore(normalTex, pixelCoord, vec4(n, 0.0f));
+}
