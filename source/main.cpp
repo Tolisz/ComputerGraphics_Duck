@@ -9,8 +9,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1536
+#define WINDOW_HEIGHT 864
 #define WINDOW_TITLE "Duck"
 
 int main() 

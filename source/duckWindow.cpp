@@ -10,7 +10,7 @@
 #include <iostream>
 #include <cmath>
 
-std::string duckWindow::m_shaderBasePath = "shaders/duck/";
+std::string duckWindow::m_shaderBasePath = "shaders/";
 
 duckWindow::duckWindow()
     : m_gen(m_rd()), 
@@ -40,6 +40,8 @@ void duckWindow::RunInit()
 
     const GLubyte* renderer = glGetString(GL_RENDERER);
     m_gui_renderer = std::string((const char*)renderer);
+
+    glfwSwapInterval(1);
 
     // GLFW 
     // ======================
@@ -108,15 +110,6 @@ void duckWindow::RunInit()
     m_sh_skyBox.AttachShader(shPath("skyBox.vert"), GL_VERTEX_SHADER);
     m_sh_skyBox.AttachShader(shPath("skyBox.frag"), GL_FRAGMENT_SHADER);
     m_sh_skyBox.Link();
-
-    // std::vector<std::string> defaultSkyBox = {
-    //     "resources/textures/CM_skybox/right.jpg",
-    //     "resources/textures/CM_skybox/left.jpg",
-    //     "resources/textures/CM_skybox/top.jpg",
-    //     "resources/textures/CM_skybox/bottom.jpg",
-    //     "resources/textures/CM_skybox/front.jpg",
-    //     "resources/textures/CM_skybox/back.jpg"
-    // }; 
 
     std::vector<std::string> cadcam = {
         "resources/textures/CM_310/px.png",
@@ -443,10 +436,11 @@ void duckWindow::RenderGUI()
     ImGui::NewFrame();
     // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
 
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-    ImGui::SetNextWindowSizeConstraints(ImVec2(200.0f, -1), ImVec2(FLT_MAX, -1), &duckWindow::InfoWindowSizeCallback, (void*)this);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(250.0f, -1), ImVec2(FLT_MAX, -1), &duckWindow::InfoWindowSizeCallback, (void*)this);
     ImGui::Begin("Project: Duck", (bool*)0, flags);
     GenGUI_AppStatistics();
     GenGUI_Light();
@@ -455,6 +449,8 @@ void duckWindow::RenderGUI()
     GenGUI_Simulation();
     //ImGui::ShowDemoWindow();
     ImGui::End();
+
+	ImGui::PopStyleVar(1);
 
     // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
     ImGui::Render();
