@@ -7,6 +7,15 @@
 
 #include <stb_image.h>
 
+#ifdef EMBEDDED_SHADERS
+	#include "shaders/all_shaders.hpp"
+#endif
+
+// #ifdef EMBEDDED_SHADERS
+//     extern const std::string shader_waterSimulation_comp;
+//     extern const std::string shader_waterNormals_comp;
+// #endif
+
 waterGrid::waterGrid()
     : waterGrid(GRID_SIZE, 2.0f, 1.0f)
 { }
@@ -164,7 +173,11 @@ void waterGrid::PopulateBuffers()
 void waterGrid::PrepareShaders(const std::string& shaderPath)
 {
     m_sh_waterSimulation.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_waterSimulation.AttachShader(shaderPath + "waterSimulation.comp", GL_COMPUTE_SHADER);
+#else 
+    m_sh_waterSimulation.AttachShader(shader_waterSimulation_comp, GL_COMPUTE_SHADER, true);
+#endif
     m_sh_waterSimulation.Link();
 
     m_sh_waterSimulation.Use();
@@ -174,7 +187,11 @@ void waterGrid::PrepareShaders(const std::string& shaderPath)
     m_sh_waterSimulation.set1f("h", m_h);
 
     m_sh_computeNormals.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_computeNormals.AttachShader(shaderPath + "waterNormals.comp", GL_COMPUTE_SHADER);
+#else 
+    m_sh_computeNormals.AttachShader(shader_waterNormals_comp, GL_COMPUTE_SHADER, true);
+#endif 
     m_sh_computeNormals.Link();
 
     m_sh_computeNormals.Use();

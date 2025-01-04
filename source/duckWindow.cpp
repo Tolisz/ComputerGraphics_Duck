@@ -7,6 +7,10 @@
 #include <glm/trigonometric.hpp>
 #include <stb_image.h>
 
+#ifdef EMBEDDED_SHADERS
+	#include "shaders/all_shaders.hpp"
+#endif
+
 #include <iostream>
 #include <cmath>
 
@@ -72,8 +76,13 @@ void duckWindow::RunInit()
     m_obj_lights.push_back(l);
 
     m_sh_light.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_light.AttachShader(shPath("lightBillboard.vert"), GL_VERTEX_SHADER);
     m_sh_light.AttachShader(shPath("lightBillboard.frag"), GL_FRAGMENT_SHADER);
+#else 
+    m_sh_light.AttachShader(shader_lightBillboard_vert, GL_VERTEX_SHADER, true);
+    m_sh_light.AttachShader(shader_lightBillboard_frag, GL_FRAGMENT_SHADER, true);    
+#endif 
     m_sh_light.Link();
 
     // Materials
@@ -95,8 +104,13 @@ void duckWindow::RunInit()
     m_waterColor = glm::vec3(0.0288, 0.960, 0.882);
 
     m_sh_water.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_water.AttachShader(shPath("water.vert"), GL_VERTEX_SHADER);
     m_sh_water.AttachShader(shPath("water.frag"), GL_FRAGMENT_SHADER);
+#else
+    m_sh_water.AttachShader(shader_water_vert, GL_VERTEX_SHADER, true);
+    m_sh_water.AttachShader(shader_water_frag, GL_FRAGMENT_SHADER, true);
+#endif
     m_sh_water.Link();
 
     m_sh_water.Use();
@@ -107,8 +121,13 @@ void duckWindow::RunInit()
     m_obj_skyBox.InitGL();
     
     m_sh_skyBox.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_skyBox.AttachShader(shPath("skyBox.vert"), GL_VERTEX_SHADER);
     m_sh_skyBox.AttachShader(shPath("skyBox.frag"), GL_FRAGMENT_SHADER);
+#else
+    m_sh_skyBox.AttachShader(shader_skyBox_vert, GL_VERTEX_SHADER, true);
+    m_sh_skyBox.AttachShader(shader_skyBox_frag, GL_FRAGMENT_SHADER, true);
+#endif
     m_sh_skyBox.Link();
 
     std::vector<std::string> cadcam = {
@@ -126,8 +145,13 @@ void duckWindow::RunInit()
     m_obj_duck.InitGLFromFile("resources/meshes/duck/duck.txt");
     
     m_sh_duck.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_duck.AttachShader(shPath("duck.vert"), GL_VERTEX_SHADER);
     m_sh_duck.AttachShader(shPath("duck.frag"), GL_FRAGMENT_SHADER);
+#else 
+    m_sh_duck.AttachShader(shader_duck_vert, GL_VERTEX_SHADER, true);
+    m_sh_duck.AttachShader(shader_duck_frag, GL_FRAGMENT_SHADER, true);   
+#endif
     m_sh_duck.Link();
 
     m_sh_duck.Use();
@@ -141,9 +165,15 @@ void duckWindow::RunInit()
     m_obj_debugBezier.UpdatePoints(points);
 
     m_sh_debugBezier.Init();
+#ifndef EMBEDDED_SHADERS
     m_sh_debugBezier.AttachShader(shPath("bezierCurve.vert"), GL_VERTEX_SHADER);
     m_sh_debugBezier.AttachShader(shPath("bezierCurve.geom"), GL_GEOMETRY_SHADER);
     m_sh_debugBezier.AttachShader(shPath("bezierCurve.frag"), GL_FRAGMENT_SHADER);
+#else 
+    m_sh_debugBezier.AttachShader(shader_bezierCurve_vert, GL_VERTEX_SHADER, true);
+    m_sh_debugBezier.AttachShader(shader_bezierCurve_geom, GL_GEOMETRY_SHADER, true);
+    m_sh_debugBezier.AttachShader(shader_bezierCurve_frag, GL_FRAGMENT_SHADER, true);   
+#endif
     m_sh_debugBezier.Link();
 
     // OpenGL initial configuration
