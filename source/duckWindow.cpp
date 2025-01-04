@@ -493,7 +493,7 @@ void duckWindow::GenGUI_AppStatistics()
         m_gui_FrameNumToSumCounter = 0;
         m_gui_AvarageFrameNumRenderTime = m_gui_FrameNumRenderTimeCounter / m_gui_FrameNumToSum;
         m_gui_FrameNumRenderTimeCounter = 0.0f;
-        m_gui_FrameNumToSum = static_cast<int>(std::max(std::ceilf(0.5f / m_gui_AvarageFrameNumRenderTime), 1.0f));
+        m_gui_FrameNumToSum = static_cast<int>(std::max(std::ceil(0.5f / m_gui_AvarageFrameNumRenderTime), 1.0f));
     }
     else {
         m_gui_FrameNumToSumCounter++;
