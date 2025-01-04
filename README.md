@@ -9,7 +9,7 @@ This is one of the projects created during *"Computer Graphics 2"* course, speci
 Project features: 
 
 - The duck moves along segments of B-spline.
-- Custom proceduraly generated billboards are used to represent spot lights on the scene.
+- Custom procedurally generated billboards are used to represent point lights on the scene.
 - The scene is lit using the Phong model.
 - Compute shaders are used for water simulation and respective computation of water surface normal vectors.
 - Snell's window effect when looking from under the water. 
